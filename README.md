@@ -14,7 +14,7 @@ mysql表结构自动同步工具
 
 
 ### 安装
->go get -u github.com/hidu/mysql-schema-sync
+>go get -u github.com/admpub/mysql-schema-sync
 
 
 ### 配置
