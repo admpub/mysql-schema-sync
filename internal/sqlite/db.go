@@ -78,6 +78,7 @@ func (mydb *MyDb) GetTableSchema(name string) (schema string) {
 	if len(schema) == 0 {
 		return
 	}
+	schema = FormatSchema(schema)
 	schema += ";\n"
 	rs.Close()
 	rs, err = mydb.Query(fmt.Sprintf("SELECT sql FROM sqlite_master WHERE type='index' and tbl_name='%s'", name))

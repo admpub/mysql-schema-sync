@@ -17,5 +17,9 @@ func TestDb(t *testing.T) {
 	for _, table := range tables {
 		schema := c.GetTableSchema(table)
 		fmt.Println(schema)
+		sc := ParseSchema(schema)
+		com.Dump(sc)
+		break
 	}
+	//panic(``)
 }

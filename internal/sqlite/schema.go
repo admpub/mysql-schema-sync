@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	indexReg      = regexp.MustCompile("^CREATE (UNIQUE )?INDEX [`\"]([^`\"]+)[`\"]")
+	indexReg      = regexp.MustCompile("^CREATE (?:UNIQUE )?INDEX [`\"]([^`\"]+)[`\"]")
 	index2Reg     = regexp.MustCompile("^CONSTRAINT [`\"]([^`\"]+)[`\"] UNIQUE")
 	foreignKeyReg = regexp.MustCompile("^CONSTRAINT [`\"]([^`\"]+)[`\"] FOREIGN KEY.+ REFERENCES [`\"]([^`\"]+)[`\"] ")
 )
@@ -51,9 +51,6 @@ func parseDbIndexLine(line string) *internal.DbIndex {
 func ParseSchema(schema string) *internal.MySchema {
 	schema = strings.TrimSpace(schema)
 	lines := strings.Split(schema, "\n")
-	if len(lines) == 1 {
-		lines = strings.Split(schema, ",")
-	}
 	mys := internal.NewSchema(schema)
 	var hasPrimaryKey bool
 	for _, line := range lines {
@@ -70,13 +67,20 @@ func ParseSchema(schema string) *internal.MySchema {
 		case '"':
 			quote = `"`
 		}
-		println(`[`, line, `]`)
+		//println(`[`, line, `]`)
 		var idx *internal.DbIndex
+		var isPK bool
 		if len(quote) > 0 {
 			index := strings.Index(line[1:], quote)
 			name := line[1 : index+1]
 			mys.Fields[name] = line
-		} else if !hasPrimaryKey && (strings.HasSuffix(line, ` PRIMARY KEY`) || strings.HasPrefix(line, `PRIMARY KEY `)) {
+			if !hasPrimaryKey && strings.HasSuffix(line, ` PRIMARY KEY`) {
+				isPK = true
+			}
+		} else if !hasPrimaryKey && strings.HasPrefix(line, `PRIMARY KEY `) {
+			isPK = true
+		}
+		if isPK {
 			idx = &internal.DbIndex{
 				SQL:            line,
 				RelationTables: []string{},
@@ -102,4 +106,21 @@ func ParseSchema(schema string) *internal.MySchema {
 	//	fmt.Println("-----")
 	return mys
 
+}
+
+func FormatSchema(schema string) string {
+	tempCleaned := strings.TrimRight(schema, "\r\n")
+	if !strings.Contains(tempCleaned, "\n") {
+		p := strings.Index(schema, `(`)
+		if p > 0 {
+			schema = schema[:p] + "(\n" + schema[p+1:]
+		}
+		p = strings.LastIndex(schema, `)`)
+		if p > 0 {
+			schema = schema[:p] + "\n" + schema[p:]
+		}
+		lines := strings.Split(schema, ",")
+		schema = strings.Join(lines, ",\n")
+	}
+	return schema
 }

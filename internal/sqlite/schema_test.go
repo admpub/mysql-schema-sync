@@ -8,7 +8,7 @@ import (
 )
 
 var schemaData = `CREATE TABLE "forever_process2" (
-	"id" integer,
+	"id" integer NOT NULL,
 	"name" varchar(60) NOT NULL COLLATE NOCASE,
 	"disabled" char(9) NOT NULL DEFAULT 'N' COLLATE NOCASE,
 	"updated" integer NOT NULL DEFAULT '0',
@@ -16,11 +16,11 @@ var schemaData = `CREATE TABLE "forever_process2" (
 	"created" integer NOT NULL,
 	"idx" integer,
 	"wid" integer,
-	PRIMARY KEY ("id"),
+	PRIMARY KEY ("id", "name"),
 	CONSTRAINT "wid" FOREIGN KEY ("wid") REFERENCES "forever_process" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-	CONSTRAINT "idx" UNIQUE ("idx") ON CONFLICT FAIL
-);
-` + "CREATE UNIQUE INDEX `UNQ_forever_process3_name` ON `forever_process3`(`name`)\n" + "CREATE UNIQUE INDEX `UNQ_forever_process_name` ON `forever_process`(`name`)\n"
+	CONSTRAINT "idx" UNIQUE ("idx" ASC) ON CONFLICT FAIL
+  );
+` + "CREATE UNIQUE INDEX `UNQ_forever_process3_name` ON `forever_process2`(`name`);\n" + "CREATE UNIQUE INDEX `UNQ_forever_process_name` ON `forever_process2`(`name2`);\n"
 
 func TestDBSchema(t *testing.T) {
 	schema := NewSchemaData(schemaData, `source`)
@@ -28,5 +28,5 @@ func TestDBSchema(t *testing.T) {
 	fmt.Printf(`schema: %s`+"\n", schema.GetTableSchema(`forever_process2`))
 	sc := ParseSchema(schema.GetTableSchema(`forever_process2`))
 	com.Dump(sc)
-	//panic(schemaData)
+	//panic(``)
 }
