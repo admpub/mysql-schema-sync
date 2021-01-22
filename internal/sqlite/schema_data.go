@@ -14,6 +14,7 @@ var (
 type SchemaData struct {
 	Data   string
 	dbType string
+	engine string
 }
 
 // NewSchemaData object
@@ -21,7 +22,12 @@ func NewSchemaData(schema string, dbType string) *SchemaData {
 	return &SchemaData{
 		Data:   schema,
 		dbType: dbType,
+		engine: `sqlite`,
 	}
+}
+
+func (m *SchemaData) DBEngine() string {
+	return m.engine
 }
 
 // GetTableNames table names
@@ -38,7 +44,7 @@ func (m *SchemaData) GetTableNames() []string {
 
 // GetTableSchema table schema
 func (m *SchemaData) GetTableSchema(name string) (schema string) {
-	schemaStruct, err := regexp.Compile("(?sm)CREATE TABLE [^`\"]*[\"`]" + name + "[\"`] \\((.+?)\\);[\\r]?\\n")
+	schemaStruct, err := regexp.Compile("(?sm)CREATE TABLE [^`\"]*[\"`]" + name + "[\"`] \\((.+?)\\)[;]?(?:[\\r]?\\n|$)")
 	if err != nil {
 		log.Println(err)
 	}
@@ -67,6 +73,12 @@ func (m *SchemaData) GetTableSchema(name string) (schema string) {
 // Query execute sql query
 func (m *SchemaData) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	log.Println("[SQL]", "["+m.dbType+"]", query, args)
+	return nil, nil
+}
+
+// Exec execute sql query
+func (m *SchemaData) Exec(query string) (sql.Result, error) {
+	log.Println("[SQL]", "["+m.dbType+"]", query)
 	return nil, nil
 }
 

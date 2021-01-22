@@ -24,10 +24,10 @@ const (
 	IndexTypeForeignKey           = "FOREIGN KEY"
 )
 
-func (idx *DbIndex) alterAddSQL(drop bool) string {
+func (idx *DbIndex) AlterAddSQL(drop bool) string {
 	alterSQL := []string{}
 	if drop {
-		dropSQL := idx.alterDropSQL()
+		dropSQL := idx.AlterDropSQL()
 		if dropSQL != "" {
 			alterSQL = append(alterSQL, dropSQL)
 		}
@@ -49,7 +49,7 @@ func (idx *DbIndex) String() string {
 	return string(bs)
 }
 
-func (idx *DbIndex) alterDropSQL() string {
+func (idx *DbIndex) AlterDropSQL() string {
 	switch idx.IndexType {
 	case IndexTypePrimary:
 		return "DROP PRIMARY KEY"

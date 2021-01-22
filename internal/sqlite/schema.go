@@ -101,19 +101,23 @@ func ParseSchema(schema string) *internal.MySchema {
 			mys.IndexAll[idx.Name] = idx
 		}
 	}
-	//	fmt.Println(schema)
-	//	fmt.Println(mys)
-	//	fmt.Println("-----")
 	return mys
 
 }
+
+var backets = regexp.MustCompile(`\([^()]+(,[^()]+)+\)`)
 
 func FormatSchema(schema string) string {
 	tempCleaned := strings.TrimRight(schema, "\r\n")
 	if !strings.Contains(tempCleaned, "\n") {
 		p := strings.Index(schema, `(`)
+		var replaced bool
 		if p > 0 {
-			schema = schema[:p] + "(\n" + schema[p+1:]
+			schema2 := backets.ReplaceAllStringFunc(schema[p+1:], func(s string) string {
+				replaced = true
+				return strings.ReplaceAll(s, `,`, `#comma#`)
+			})
+			schema = schema[:p] + "(\n" + schema2
 		}
 		p = strings.LastIndex(schema, `)`)
 		if p > 0 {
@@ -121,6 +125,9 @@ func FormatSchema(schema string) string {
 		}
 		lines := strings.Split(schema, ",")
 		schema = strings.Join(lines, ",\n")
+		if replaced {
+			schema = strings.ReplaceAll(schema, `#comma#`, `,`)
+		}
 	}
 	return schema
 }

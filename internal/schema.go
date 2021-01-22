@@ -107,12 +107,16 @@ type SchemaDiff struct {
 	Dest   *MySchema
 }
 
-func newSchemaDiff(table, source, dest string) *SchemaDiff {
+func NewSchemaDiff(table string, source *MySchema, dest *MySchema) *SchemaDiff {
 	return &SchemaDiff{
 		Table:  table,
-		Source: ParseSchema(source),
-		Dest:   ParseSchema(dest),
+		Source: source,
+		Dest:   dest,
 	}
+}
+
+func newSchemaDiff(table, source, dest string) *SchemaDiff {
+	return NewSchemaDiff(table, ParseSchema(source), ParseSchema(dest))
 }
 
 func (sdiff *SchemaDiff) RelationTables() []string {

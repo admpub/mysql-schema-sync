@@ -4,12 +4,20 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/admpub/mysql-schema-sync/internal"
+)
+
+var (
+	_ internal.DBOperator = &MyDb{}
+	_ internal.DBOperator = &SchemaData{}
 )
 
 // MyDb db struct
 type MyDb struct {
 	*sql.DB
 	dbType string
+	engine string
 }
 
 // New parse dsn
@@ -24,7 +32,12 @@ func New(dsn string, dbType string) *MyDb {
 	return &MyDb{
 		DB:     db,
 		dbType: dbType,
+		engine: `sqlite`,
 	}
+}
+
+func (mydb *MyDb) DBEngine() string {
+	return mydb.engine
 }
 
 // GetTableNames table names
@@ -102,5 +115,11 @@ func (mydb *MyDb) GetTableSchema(name string) (schema string) {
 // Query execute sql query
 func (mydb *MyDb) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	log.Println("[SQL]", "["+mydb.dbType+"]", query, args)
-	return mydb.DB.Query(query, args...)
+	return mydb.DB.Query(query)
+}
+
+// Exec execute sql query
+func (mydb *MyDb) Exec(query string) (sql.Result, error) {
+	log.Println("[SQL]", "["+mydb.dbType+"]", query)
+	return internal.Exec(mydb.DB, query)
 }
