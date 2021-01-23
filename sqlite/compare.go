@@ -58,13 +58,8 @@ func (c *Compare) getSchemaDiff(sc *internal.SchemaSync, alter *internal.TableAl
 	dest := alter.SchemaDiff.Dest
 	table := alter.Table
 	var hasChanges bool
-	var sameFields []string
 	//比对字段
 	for name, dt := range source.Fields {
-		destDt, has := dest.Fields[name]
-		if has {
-			sameFields = append(sameFields, name)
-		}
 		if sc.Config.IsIgnoreField(table, name) {
 			log.Printf("ignore column %s.%s", table, name)
 			continue
@@ -72,6 +67,7 @@ func (c *Compare) getSchemaDiff(sc *internal.SchemaSync, alter *internal.TableAl
 		if sc.Config.SQLPreprocessor() != nil {
 			dt = sc.Config.SQLPreprocessor()(dt)
 		}
+		destDt, has := dest.Fields[name]
 		if has {
 			if !isSameSchemaItem(dt, destDt) {
 				com.Dump(map[string]interface{}{`src.`: dt, `dest`: destDt})
@@ -194,6 +190,12 @@ func (c *Compare) getSchemaDiff(sc *internal.SchemaSync, alter *internal.TableAl
 
 	if !hasChanges {
 		return ``
+	}
+	var sameFields []string
+	for name := range source.Fields {
+		if _, has := dest.Fields[name]; has {
+			sameFields = append(sameFields, name)
+		}
 	}
 	if len(sameFields) == 0 {
 		com.Dump(sameFields)

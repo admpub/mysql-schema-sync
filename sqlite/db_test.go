@@ -34,7 +34,7 @@ func TestDb(t *testing.T) {
 }
 
 func TestSync(t *testing.T) {
-	return
+	//return
 	cfg := &internal.Config{}
 	cfg.Drop = true
 	cfg.Sync = true
