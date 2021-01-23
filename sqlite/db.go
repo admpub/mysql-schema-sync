@@ -88,12 +88,12 @@ func (mydb *MyDb) GetTableSchema(name string) (schema string) {
 			panic(fmt.Sprintf("get table %s 's schema failed,%s", name, err))
 		}
 	}
+	rs.Close()
 	if len(schema) == 0 {
 		return
 	}
 	schema = FormatSchema(schema)
 	schema += ";\n"
-	rs.Close()
 	rs, err = mydb.Query(fmt.Sprintf("SELECT sql FROM sqlite_master WHERE type='index' and tbl_name='%s'", name))
 	if err != nil {
 		log.Println(err)
