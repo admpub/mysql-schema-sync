@@ -12,9 +12,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var (
+	testDBFile  = `/Users/hank/go/src/github.com/admpub/nging/dist/localtest/nging_darwin_amd64/nging.db`
+	testSQLFile = `/Users/hank/Downloads/nging.sqlite.sql`
+)
+
 func TestDb(t *testing.T) {
 	return
-	c := New(`/Users/hank/Downloads/nging_hk.db`, ``)
+	c := New(testDBFile, ``)
 	tables := c.GetTableNames()
 	com.Dump(tables)
 	//return
@@ -34,8 +39,8 @@ func TestSync(t *testing.T) {
 	cfg.Drop = true
 	cfg.Sync = true
 	cfg.SetComparer(NewCompare())
-	destDB := New(`/Users/hank/go/src/github.com/admpub/nging/dist/localtest/nging_darwin_amd64/nging.db`, `dest`)
-	content, err := ioutil.ReadFile(`/Users/hank/Downloads/nging.sqlite.sql`)
+	destDB := New(testDBFile, `dest`)
+	content, err := ioutil.ReadFile(testSQLFile)
 	if err != nil {
 		panic(err)
 	}
